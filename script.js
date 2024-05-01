@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const registerButton = document.getElementById('registerButton');
     const loggedInUser = document.getElementById('loggedInUser');
 
-    // Mostrar u ocultar botones según el estado de autenticación
+    // Función para mostrar u ocultar botones según el estado de autenticación
     function toggleAuthButtons(user) {
         if (user) {
             loggedInUser.textContent = user.user_metadata.full_name || user.email;
@@ -18,22 +18,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Iniciar sesión al hacer clic en "Iniciar Sesión"
+    // Inicializar Netlify Identity
+    const netlifyIdentity = window.netlifyIdentity;
+    netlifyIdentity.init();
+
+    // Manejar eventos al hacer clic en "Iniciar Sesión"
     loginButton.addEventListener('click', () => {
         netlifyIdentity.open();
     });
 
-    // Registrarse al hacer clic en "Registrarse"
+    // Manejar eventos al hacer clic en "Registrarse"
     registerButton.addEventListener('click', () => {
         netlifyIdentity.open('signup');
     });
 
-    // Mostrar nombre de usuario si está autenticado
+    // Manejar eventos al iniciar sesión
     netlifyIdentity.on('login', (user) => {
         toggleAuthButtons(user);
     });
 
-    // Ocultar nombre de usuario al cerrar sesión
+    // Manejar eventos al cerrar sesión
     netlifyIdentity.on('logout', () => {
         toggleAuthButtons(null);
     });
@@ -44,12 +48,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Redirigir al usuario a la página de inicio de sesión al hacer clic en "¡JUGAR!"
     playButton.addEventListener('click', () => {
-        if (!currentUser) {
+        const user = netlifyIdentity.currentUser();
+        if (!user) {
             alert('Debes iniciar sesión para jugar.');
             netlifyIdentity.open();
         } else {
             // Aquí podrías redirigir al usuario a la página del juego
-            alert(`¡Hola, ${currentUser.user_metadata.full_name || currentUser.email}! Preparándote para jugar...`);
+            alert(`¡Hola, ${user.user_metadata.full_name || user.email}! Preparándote para jugar...`);
         }
     });
 });
